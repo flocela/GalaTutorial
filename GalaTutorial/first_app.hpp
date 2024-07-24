@@ -20,8 +20,12 @@ namespace lve
         
         // TODO can't use whole path name here!
         LveWindow lveWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
-        LvePipeline lvePipeline{"/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/shaders/simple_shader.vert.spv",
-            "/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/shaders/simple_shader.frag.spv"};
+        LveDevice lveDevice{lveWindow};
+        LvePipeline lvePipeline{
+            lveDevice,
+            "/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/shaders/simple_shader.vert.spv",
+            "/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/shaders/simple_shader.frag.spv",
+            LvePipeline::defaultPipelineConfigInfo(WIDTH, HEIGHT)};
     };
 }
 
