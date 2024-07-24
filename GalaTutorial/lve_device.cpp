@@ -128,7 +128,7 @@ void LveDevice::pickPhysicalDevice()
     {
         throw std::runtime_error("failed to find GPUs with Vulkan support!");
     }
-    std::cout << "Device count: " << deviceCount << std::endl;
+    //std::cout << "Device count: " << deviceCount << std::endl;
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
@@ -147,7 +147,7 @@ void LveDevice::pickPhysicalDevice()
     }
 
     vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-    std::cout << "physical device: " << properties.deviceName << std::endl;
+    //std::cout << "physical device: " << properties.deviceName << std::endl;
 }
 
 void LveDevice::createLogicalDevice() {
@@ -313,7 +313,7 @@ void LveDevice::hasGflwRequiredInstanceExtensions() {
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
     std::vector<VkExtensionProperties> extensions(extensionCount);
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
-
+/*
     std::cout << "available extensions:" << std::endl;
     std::unordered_set<std::string> available;
     for (const auto &extension : extensions) {
@@ -330,7 +330,7 @@ void LveDevice::hasGflwRequiredInstanceExtensions() {
             throw std::runtime_error("Missing required glfw extension");
         }
     }
- 
+ */
 }
 
 bool LveDevice::checkDeviceExtensionSupport(VkPhysicalDevice device) {
