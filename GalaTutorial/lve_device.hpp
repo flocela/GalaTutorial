@@ -88,7 +88,7 @@ class LveDevice {
     void createLogicalDevice();
     void createCommandPool();
 
-  // helper functions
+    // helper functions
     bool isDeviceSuitable(VkPhysicalDevice device);
     std::vector<const char *> getRequiredExtensions();
     bool checkValidationLayerSupport();
