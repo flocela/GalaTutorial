@@ -18,6 +18,7 @@ namespace lve{
         
         bool shouldClose();
         
+        // initializes VkSurfaceKHR*
         void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
         
         private:
