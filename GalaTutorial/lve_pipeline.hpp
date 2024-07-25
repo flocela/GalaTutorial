@@ -9,18 +9,19 @@ namespace lve
 {
     struct PipelineConfigInfo
     {
-        VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
-        VkViewport viewport;
-        VkRect2D scissor;
-        VkPipelineViewportStateCreateInfo viewportInfo;
-        VkPipelineRasterizationStateCreateInfo rasterizationInfo;
-        VkPipelineMultisampleStateCreateInfo multisampleInfo;
+        VkPipelineInputAssemblyStateCreateInfo  inputAssemblyInfo;
+        VkPipelineViewportStateCreateInfo       viewportInfo;
+        VkPipelineRasterizationStateCreateInfo  rasterizationInfo;
+        VkPipelineMultisampleStateCreateInfo    multisampleInfo;
+        VkPipelineColorBlendStateCreateInfo     colorBlendInfo;
+        VkPipelineDepthStencilStateCreateInfo   depthStencilInfo;
+        
+        VkViewport                          viewport;
+        VkRect2D                            scissor;
         VkPipelineColorBlendAttachmentState colorBlendAttachment;
-        VkPipelineColorBlendStateCreateInfo colorBlendInfo;
-        VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
-        VkPipelineLayout pipelineLayout = nullptr;
-        VkRenderPass renderPass = nullptr;
-        uint32_t subpass = 0;
+        VkPipelineLayout                    pipelineLayout = nullptr;
+        VkRenderPass                        renderPass = nullptr;
+        uint32_t                            subpass = 0;
     };
 
     class LvePipeline
