@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
+#include <cassert>
 
 namespace lve
 {
@@ -46,6 +47,13 @@ namespace lve
             const std::string fragFilepath,
             const PipelineConfigInfo& configInfo)
     {
+        assert(configInfo.pipelineLayout != VK_NULL_HANDLE &&
+            "Cannot create graphics pipeline:: no piplinelayout provided in configInfo.");
+        
+        assert(configInfo.renderPass != VK_NULL_HANDLE &&
+            "Cannot create graphics pipeline:: no renderPass provided in configInfo.");
+        
+        
         // Use a VkGraphicsPipelineCreateInfo to initialize the attribute VkPipeline graphicsPipeline.
         // VkGraphicsPipelineCreateInfo requires a
         // VkPipelineShaderStageCreateInfo and a VkPipelineVertexInputStateCreateInfo.
