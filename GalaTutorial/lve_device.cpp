@@ -74,30 +74,35 @@ LveDevice::~LveDevice() {
 }
 
 void LveDevice::createInstance() {
+    
+    // Checks
     if (enableValidationLayers && !checkValidationLayerSupport())
     {
         throw std::runtime_error("validation layers requested, but not available!");
     }
-
-    VkApplicationInfo appInfo = {};
-    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = "LittleVulkanEngine App";
-    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.pEngineName = "No Engine";
-    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.apiVersion = VK_API_VERSION_1_0;
-
+    
+    // VkInstanceCreateInfo createInfo needs an appInfo.
+    // Initialize createInfo.
     VkInstanceCreateInfo createInfo = {};
-    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    VkApplicationInfo appInfo = {};
     
+    appInfo.sType               = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    appInfo.pApplicationName    = "LittleVulkanEngine App";
+    appInfo.applicationVersion  = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.pEngineName         = "No Engine";
+    appInfo.engineVersion       = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.apiVersion          = VK_API_VERSION_1_0;
+
     createInfo.pApplicationInfo = &appInfo;
-    
+    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR; // macOS fix
 
+    // Required extensions need to be added to createInfo.
     auto extensions = getRequiredExtensions();
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
+    // Add debug validation layers if debugging.
     if (enableValidationLayers)
     {
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
@@ -113,6 +118,7 @@ void LveDevice::createInstance() {
         createInfo.pNext = nullptr;
     }
 
+    // Finally, create initialize private member VkInstance instance.
     if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
         throw std::runtime_error("failed to create instance!");
     }
