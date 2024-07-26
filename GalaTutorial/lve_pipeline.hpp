@@ -10,7 +10,6 @@ namespace lve
     struct PipelineConfigInfo
     {
         VkPipelineInputAssemblyStateCreateInfo  inputAssemblyInfo;
-        VkPipelineViewportStateCreateInfo       viewportInfo;
         VkPipelineRasterizationStateCreateInfo  rasterizationInfo;
         VkPipelineMultisampleStateCreateInfo    multisampleInfo;
         VkPipelineColorBlendStateCreateInfo     colorBlendInfo;
@@ -40,6 +39,7 @@ namespace lve
         LvePipeline(const LvePipeline& o) = delete;
         LvePipeline& operator=(const LvePipeline& o) = delete;
         
+        void bind(VkCommandBuffer commandBuffer);
         static PipelineConfigInfo defaultPipelineConfigInfo(uint32_t width, uint32_t height);
         private:
         
