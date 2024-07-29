@@ -6,6 +6,7 @@ namespace lve
     
     FirstApp::FirstApp()
     {
+        loadModels();
         // Need a PipelineLayout to initialize Pipeline.
         createPipelineLayout();
         
@@ -30,6 +31,17 @@ namespace lve
         vkDeviceWaitIdle(lveDevice.device());
     }
 
+    void FirstApp::loadModels()
+    {
+        std::vector<LveModel::Vertex> vertices
+        {
+            {{0.0f, -0.5f}},
+            {{0.5f, 0.5f}},
+            {{-0.5f, 0.5f}}
+        };
+        lveModel = std::make_unique<LveModel>(lveDevice, vertices);
+    }
+
     void FirstApp::createPipelineLayout()
     {
         // pipelineLayoutInfo has pSetLayouts and pPushConstantRanges. This is information
@@ -50,7 +62,7 @@ namespace lve
 
     void FirstApp::createPipeline()
     {
-        auto pipelineConfig =
+        LvePipelineConfigInfo pipelineConfig =
             LvePipeline::defaultPipelineConfigInfo(lveSwapChain.width(),lveSwapChain.height());
         
         pipelineConfig.renderPass = lveSwapChain.getRenderPass();
@@ -108,8 +120,11 @@ namespace lve
             // First thing to do in render pass is bind a pipeline.
             lvePipeline->bind(commandBuffers[i]);
             
+            lveModel->bind(commandBuffers[i]);
+            lveModel->draw(commandBuffers[i]);
+            
             // draw 3 vertices and only one instance.
-            vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+            //vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
             
             vkCmdEndRenderPass(commandBuffers[i]);
             if(vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
@@ -117,7 +132,6 @@ namespace lve
                 throw std::runtime_error("failed to record command buffer!");
             }
         }
-        
     }
 
     void FirstApp::drawFrame()

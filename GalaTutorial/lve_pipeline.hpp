@@ -7,7 +7,7 @@
 
 namespace lve
 {
-    struct PipelineConfigInfo
+    struct LvePipelineConfigInfo
     {
         VkPipelineInputAssemblyStateCreateInfo  inputAssemblyInfo;
         VkPipelineRasterizationStateCreateInfo  rasterizationInfo;
@@ -31,7 +31,7 @@ namespace lve
             LveDevice& device,
             const std::string& vertFilepath,
             const std::string fragFilepath,
-            const PipelineConfigInfo& configInfo
+            const LvePipelineConfigInfo& lvePipelineCI
         );
         
         ~LvePipeline();
@@ -40,7 +40,7 @@ namespace lve
         LvePipeline& operator=(const LvePipeline& o) = delete;
         
         void bind(VkCommandBuffer commandBuffer);
-        static PipelineConfigInfo defaultPipelineConfigInfo(uint32_t width, uint32_t height);
+        static LvePipelineConfigInfo defaultPipelineConfigInfo(uint32_t width, uint32_t height);
         private:
         
         static std::vector<char> readFile(const std::string& filepath);
@@ -48,7 +48,7 @@ namespace lve
         void createGraphicsPipeline(
             const std::string& vertFilepath,
             const std::string fragFilepath,
-            const PipelineConfigInfo& configInfo
+            const LvePipelineConfigInfo& configInfo
         );
         
         void createShaderModule(

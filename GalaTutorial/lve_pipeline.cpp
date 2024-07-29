@@ -1,4 +1,5 @@
 #include "lve_pipeline.hpp"
+#include "lve_model.hpp"
 #include <fstream>
 #include <iostream>
 #include <filesystem>
@@ -10,10 +11,10 @@ namespace lve
         LveDevice& device,
         const std::string& vertFilepath,
         const std::string fragFilepath,
-        const PipelineConfigInfo& configInfo
+        const LvePipelineConfigInfo& lvePipelineCI
     ):  lveDevice{device}
     {
-        createGraphicsPipeline(vertFilepath, fragFilepath, configInfo);
+        createGraphicsPipeline(vertFilepath, fragFilepath, lvePipelineCI);
     }
 
     LvePipeline::~LvePipeline()
@@ -45,18 +46,21 @@ namespace lve
     void LvePipeline::createGraphicsPipeline(
             const std::string& vertFilepath,
             const std::string fragFilepath,
-            const PipelineConfigInfo& configInfo)
+            const LvePipelineConfigInfo& lvePipelineCI)
     {
-        assert(configInfo.pipelineLayout != VK_NULL_HANDLE &&
+        assert(lvePipelineCI.pipelineLayout != VK_NULL_HANDLE &&
             "Cannot create graphics pipeline:: no piplinelayout provided in configInfo.");
         
-        assert(configInfo.renderPass != VK_NULL_HANDLE &&
+        assert(lvePipelineCI.renderPass != VK_NULL_HANDLE &&
             "Cannot create graphics pipeline:: no renderPass provided in configInfo.");
         
         
         // Create a VkGraphicsPipelineCreateInfo to initialize the class attribute VkPipeline graphicsPipeline.
-        // VkGraphicsPipelineCreateInfo requires 1) VkPipelineShaderStageCreateInfo, 2) VkPipelineVertexInputStateCreateInfo, 3) VkPipelineViewportStateCreateInfo.
-        // Also uses information from PipelineConfigInfo& configInfo that was passed in.
+        // VkGraphicsPipelineCreateInfo requires
+            // 1) VkPipelineShaderStageCreateInfo,
+            // 2) VkPipelineVertexInputStateCreateInfo,
+            // 3) VkPipelineViewportStateCreateInfo,
+            // 4) info from LvePipelineConfigInfo& configInfo that was passed in.
         VkGraphicsPipelineCreateInfo pipelineInfo{};
         VkPipelineShaderStageCreateInfo shaderStages[2];
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
@@ -86,18 +90,20 @@ namespace lve
         
         
         // Initialize VkPipelineVertexInputStateCreateInfo.
+        auto bindingDescriptions = LveModel::Vertex::getBindingDescriptions();
+        auto attributeDescriptions = LveModel::Vertex::getAttributeDescriptions();
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertexInputInfo.vertexAttributeDescriptionCount = 0;
-        vertexInputInfo.vertexBindingDescriptionCount   = 0;
-        vertexInputInfo.pVertexBindingDescriptions      = nullptr;
-        vertexInputInfo.pVertexBindingDescriptions      = nullptr;
+        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+        vertexInputInfo.vertexBindingDescriptionCount   = static_cast<uint32_t>(attributeDescriptions.size());
+        vertexInputInfo.pVertexAttributeDescriptions    = attributeDescriptions.data();
+        vertexInputInfo.pVertexBindingDescriptions      = bindingDescriptions.data();
         
         
         viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
         viewportInfo.viewportCount  = 1;
-        viewportInfo.pViewports     = &configInfo.viewport;
+        viewportInfo.pViewports     = &(lvePipelineCI.viewport);
         viewportInfo.scissorCount   = 1;
-        viewportInfo.pScissors = &configInfo.scissor;
+        viewportInfo.pScissors      = &(lvePipelineCI.scissor);
         
         // Initialize VkGraphicsPipelineCreateInfo pipelineInfo.
         // Use shaderStages.
@@ -106,17 +112,17 @@ namespace lve
         pipelineInfo.stageCount             = 2;
         pipelineInfo.pStages                = shaderStages;
         pipelineInfo.pVertexInputState      = &vertexInputInfo;
-        pipelineInfo.pInputAssemblyState    = &configInfo.inputAssemblyInfo;
+        pipelineInfo.pInputAssemblyState    = &lvePipelineCI.inputAssemblyInfo;
         pipelineInfo.pViewportState         = &viewportInfo;
-        pipelineInfo.pRasterizationState    = &configInfo.rasterizationInfo;
-        pipelineInfo.pMultisampleState      = &configInfo.multisampleInfo;
-        pipelineInfo.pColorBlendState       = &configInfo.colorBlendInfo;
-        pipelineInfo.pDepthStencilState     = &configInfo.depthStencilInfo;
+        pipelineInfo.pRasterizationState    = &lvePipelineCI.rasterizationInfo;
+        pipelineInfo.pMultisampleState      = &lvePipelineCI.multisampleInfo;
+        pipelineInfo.pColorBlendState       = &lvePipelineCI.colorBlendInfo;
+        pipelineInfo.pDepthStencilState     = &lvePipelineCI.depthStencilInfo;
         pipelineInfo.pDynamicState          = nullptr;
         
-        pipelineInfo.layout     = configInfo.pipelineLayout;
-        pipelineInfo.renderPass = configInfo.renderPass;
-        pipelineInfo.subpass    = configInfo.subpass;
+        pipelineInfo.layout     = lvePipelineCI.pipelineLayout;
+        pipelineInfo.renderPass = lvePipelineCI.renderPass;
+        pipelineInfo.subpass    = lvePipelineCI.subpass;
         
         pipelineInfo.basePipelineIndex  = -1;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
@@ -156,9 +162,9 @@ namespace lve
         vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
     }
 
-    PipelineConfigInfo LvePipeline::defaultPipelineConfigInfo(uint32_t width, uint32_t height)
+    LvePipelineConfigInfo LvePipeline::defaultPipelineConfigInfo(uint32_t width, uint32_t height)
     {
-        PipelineConfigInfo configInfo{};
+        LvePipelineConfigInfo configInfo{};
         
         configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
