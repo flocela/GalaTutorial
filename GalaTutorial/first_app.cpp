@@ -35,9 +35,9 @@ namespace lve
     {
         std::vector<LveModel::Vertex> vertices
         {
-            {{0.0f, -0.5f}},
-            {{0.5f, 0.5f}},
-            {{-0.5f, 0.5f}}
+            {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, 0.5f},  {0.0f, 1.0f, 0.0f}},
+            {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
         };
         lveModel = std::make_unique<LveModel>(lveDevice, vertices);
     }
@@ -62,8 +62,11 @@ namespace lve
 
     void FirstApp::createPipeline()
     {
-        LvePipelineConfigInfo pipelineConfig =
-            LvePipeline::defaultPipelineConfigInfo(lveSwapChain.width(),lveSwapChain.height());
+        LvePipelineConfigInfo pipelineConfig {};
+        LvePipeline::defaultPipelineConfigInfo(
+              pipelineConfig,
+              lveSwapChain.width(),
+              lveSwapChain.height());
         
         pipelineConfig.renderPass = lveSwapChain.getRenderPass();
         
@@ -85,7 +88,7 @@ namespace lve
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         allocInfo.commandPool = lveDevice.getCommandPool();
         allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
-        
+        //
         if(vkAllocateCommandBuffers(lveDevice.device(), &allocInfo, commandBuffers.data()) !=
             VK_SUCCESS)
         {
