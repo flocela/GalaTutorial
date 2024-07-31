@@ -26,8 +26,13 @@ namespace lve
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             vertexBuffer,
             vertexBufferMemory);
+        
+        // data is going to be host visible, adding info to data will send it to
+        // the device, which is vertexBufferMemory
         void *data;
         vkMapMemory(lveDevice.device(), vertexBufferMemory, 0, bufferSize, 0, &data);
+        
+        // add vertices info to data. Now device can see data.
         memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
         vkUnmapMemory(lveDevice.device(), vertexBufferMemory);
     }

@@ -492,6 +492,9 @@ void LveDevice::createBuffer(
         throw std::runtime_error("failed to allocate vertex buffer memory!");
     }
 
+    // device owns the buffer and bufferMemory
+    // buffer is the buffer attached to the bufferMemory
+    // bufferMemory is the VkDeviceMemory object describing the device memory to attach
     vkBindBufferMemory(device_, buffer, bufferMemory, 0);
 }
 

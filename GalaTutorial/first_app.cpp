@@ -206,8 +206,9 @@ namespace lve
         else
         {
             lveSwapChain = std::make_unique<LveSwapChain>(
-                    lveDevice,
-                    extent);
+                lveDevice,
+                extent,
+                std::move(lveSwapChain));
             if(lveSwapChain->imageCount() != commandBuffers.size())
             {
                 freeCommandBuffers();
