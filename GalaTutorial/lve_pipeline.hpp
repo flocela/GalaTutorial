@@ -19,11 +19,11 @@ namespace lve
         VkPipelineColorBlendStateCreateInfo     colorBlendInfo;
         VkPipelineDepthStencilStateCreateInfo   depthStencilInfo;
         
-        VkViewport                          viewport;
-        VkRect2D                            scissor;
         VkPipelineViewportStateCreateInfo   viewportInfo;
         VkPipelineColorBlendAttachmentState colorBlendAttachment;
         VkPipelineLayout                    pipelineLayout = nullptr;
+        std::vector<VkDynamicState>         dynamicStateEnables;
+        VkPipelineDynamicStateCreateInfo    dynamicStateInfo;
         VkRenderPass                        renderPass = nullptr;
         uint32_t                            subpass = 0;
     };
@@ -45,10 +45,7 @@ namespace lve
         LvePipeline& operator=(const LvePipeline& o) = delete;
         
         void bind(VkCommandBuffer commandBuffer);
-        static void defaultPipelineConfigInfo(
-            LvePipelineConfigInfo& configInfo,
-            uint32_t width,
-            uint32_t height);
+        static void defaultPipelineConfigInfo(LvePipelineConfigInfo& configInfo);
         private:
         
         static std::vector<char> readFile(const std::string& filepath);

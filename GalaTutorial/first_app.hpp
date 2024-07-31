@@ -28,19 +28,22 @@ namespace lve
         
         private:
         
-        void loadModels();
         LveWindow lveWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
         LveDevice lveDevice{lveWindow};
-        LveSwapChain lveSwapChain{lveDevice, lveWindow.getExtent()};
+        std::unique_ptr<LveSwapChain> lveSwapChain;
         VkPipelineLayout pipelineLayout;
         std::unique_ptr<LvePipeline> lvePipeline;
         std::vector<VkCommandBuffer> commandBuffers;
         std::unique_ptr<LveModel> lveModel;
         
+        void loadModels();
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
+        void freeCommandBuffers();
         void drawFrame();
+        void recreateSwapChain();
+        void recordCommandBuffer(int imageIndex);
     };
 }
 
