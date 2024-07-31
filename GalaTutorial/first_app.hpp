@@ -2,6 +2,7 @@
 #define first_app_hpp
 
 #include <stdio.h>
+#include "lve_game_object.hpp"
 #include "lve_pipeline.hpp"
 #include "lve_window.hpp"
 #include "lve_swap_chain.hpp"
@@ -34,9 +35,9 @@ namespace lve
         VkPipelineLayout pipelineLayout;
         std::unique_ptr<LvePipeline> lvePipeline;
         std::vector<VkCommandBuffer> commandBuffers;
-        std::unique_ptr<LveModel> lveModel;
+        std::vector<LveGameObject> gameObjects;
         
-        void loadModels();
+        void loadGameObjects();
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
@@ -44,6 +45,7 @@ namespace lve
         void drawFrame();
         void recreateSwapChain();
         void recordCommandBuffer(int imageIndex);
+        void renderGameObjects(VkCommandBuffer commandBuffer);
     };
 }
 
