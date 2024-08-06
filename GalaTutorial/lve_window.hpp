@@ -20,6 +20,7 @@ namespace lve{
         VkExtent2D getExtent();
         bool wasWindowResized();
         void resetWindowResizedFlag();
+        GLFWwindow *getGLFWwindow() const { return window;}
         
         // initializes VkSurfaceKHR*
         void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
