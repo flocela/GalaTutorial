@@ -37,6 +37,7 @@ namespace lve
         vkUnmapMemory(lveDevice.device(), vertexBufferMemory);
     }
 
+    // Bind vertex buffer to command buffer.
     void LveModel::bind(VkCommandBuffer commandBuffer)
     {
         VkBuffer buffers[] = {vertexBuffer};
@@ -44,6 +45,7 @@ namespace lve
         vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
     }
 
+    // draw primitives, first is assembling primitives.
     void LveModel::draw(VkCommandBuffer commandBuffer)
     {
         vkCmdDraw(commandBuffer, vertexCount, 1, 0, 0);
