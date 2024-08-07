@@ -57,7 +57,7 @@ void LveCamera::setViewDirection(glm::vec3 position, glm::vec3 direction, glm::v
     viewMatrix[3][1] = -glm::dot(v, position);
     viewMatrix[3][2] = -glm::dot(w, position);
 }
-
+//
 void LveCamera::setViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up) {
     setViewDirection(position, target - position, up);
 }
