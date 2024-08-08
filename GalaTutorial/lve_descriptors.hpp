@@ -41,7 +41,7 @@ namespace lve {
 
             friend class LveDescriptorWriter;
     };
-
+//
     // LveDescriptorPool
     class LveDescriptorPool {
         
