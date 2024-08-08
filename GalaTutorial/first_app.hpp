@@ -2,6 +2,7 @@
 #define first_app_hpp
 
 #include <stdio.h>
+#include "lve_descriptors.hpp"
 #include "lve_game_object.hpp"
 #include "lve_window.hpp"
 #include "lve_renderer.hpp"
@@ -31,6 +32,9 @@ namespace lve
         LveWindow                    lveWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
         LveDevice                    lveDevice{lveWindow};
         LveRenderer                  lveRenderer{lveWindow, lveDevice};
+        
+        // note: order of declaration matters. Pool needs a device.
+        std::unique_ptr<LveDescriptorPool> globalPool{};
         std::vector<LveGameObject>   gameObjects;
         
         void loadGameObjects();

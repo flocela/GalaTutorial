@@ -15,7 +15,10 @@ namespace lve
     {
         public:
         
-        SimpleRenderSystem(LveDevice &device, VkRenderPass renderPass);
+        SimpleRenderSystem(
+                LveDevice &device,
+                VkRenderPass renderPass,
+                VkDescriptorSetLayout globalSetLayout);
         ~SimpleRenderSystem();
         
         SimpleRenderSystem(const SimpleRenderSystem& o) = delete;
@@ -27,7 +30,7 @@ namespace lve
         
         private:
         
-        void createPipelineLayout();
+        void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
         void createPipeline(VkRenderPass renderPass);
     
         LveDevice&                   lveDevice;
