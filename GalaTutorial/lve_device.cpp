@@ -24,11 +24,14 @@ VkResult CreateDebugUtilsMessengerEXT(
     VkInstance instance,
     const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
     const VkAllocationCallbacks *pAllocator,
-    VkDebugUtilsMessengerEXT *pDebugMessenger) {
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-      instance,
-      "vkCreateDebugUtilsMessengerEXT");
-    if (func != nullptr) {
+    VkDebugUtilsMessengerEXT *pDebugMessenger)
+{
+    auto func = 
+        (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+        instance,
+        "vkCreateDebugUtilsMessengerEXT");
+    if (func != nullptr)
+    {
         return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
     }
     else
@@ -36,22 +39,25 @@ VkResult CreateDebugUtilsMessengerEXT(
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 }
-//
+
 void DestroyDebugUtilsMessengerEXT(
     VkInstance instance,
     VkDebugUtilsMessengerEXT debugMessenger,
     const VkAllocationCallbacks *pAllocator)
 {
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+    auto func = (
+        PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
         instance,
         "vkDestroyDebugUtilsMessengerEXT");
-    if (func != nullptr) {
+    if (func != nullptr)
+    {
         func(instance, debugMessenger, pAllocator);
     }
 }
 
 // class member functions
-LveDevice::LveDevice(LveWindow &window) : window{window}
+LveDevice::LveDevice(LveWindow &window)
+:   window{window}
 {
     createInstance();
     setupDebugMessenger();
@@ -61,11 +67,13 @@ LveDevice::LveDevice(LveWindow &window) : window{window}
     createCommandPool();
 }
 
-LveDevice::~LveDevice() {
+LveDevice::~LveDevice()
+{
     vkDestroyCommandPool(device_, commandPool, nullptr);
     vkDestroyDevice(device_, nullptr);
 
-    if (enableValidationLayers) {
+    if (enableValidationLayers)
+    {
         DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
     }
 
@@ -73,8 +81,8 @@ LveDevice::~LveDevice() {
     vkDestroyInstance(instance, nullptr);
 }
 
-void LveDevice::createInstance() {
-    
+void LveDevice::createInstance()
+{
     // Checks
     if (enableValidationLayers && !checkValidationLayerSupport())
     {
@@ -119,7 +127,8 @@ void LveDevice::createInstance() {
     }
 
     // Finally, create initialize private member VkInstance instance.
-    if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
+    if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
+    {
         throw std::runtime_error("failed to create instance!");
     }
 
@@ -188,7 +197,8 @@ void LveDevice::createLogicalDevice() {
 
     // might not really be necessary anymore because device specific validation layers
     // have been deprecated
-    if (enableValidationLayers) {
+    if (enableValidationLayers)
+    {
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
         createInfo.ppEnabledLayerNames = validationLayers.data();
     }
@@ -263,12 +273,14 @@ void LveDevice::setupDebugMessenger()
     if (!enableValidationLayers) return;
     VkDebugUtilsMessengerCreateInfoEXT createInfo;
     populateDebugMessengerCreateInfo(createInfo);
-    if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
+    if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS)
+    {
         throw std::runtime_error("failed to set up debug messenger!");
     }
 }
 
-bool LveDevice::checkValidationLayerSupport() {
+bool LveDevice::checkValidationLayerSupport()
+{
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
@@ -288,7 +300,8 @@ bool LveDevice::checkValidationLayerSupport() {
             }
         }
 
-        if (!layerFound) {
+        if (!layerFound)
+        {
             return false;
         }
     }
@@ -307,7 +320,8 @@ std::vector<const char *> LveDevice::getRequiredExtensions()
     extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
     extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
     
-    if (enableValidationLayers) {
+    if (enableValidationLayers)
+    {
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
 
@@ -339,7 +353,8 @@ void LveDevice::hasGflwRequiredInstanceExtensions() {
  */
 }
 
-bool LveDevice::checkDeviceExtensionSupport(VkPhysicalDevice device) {
+bool LveDevice::checkDeviceExtensionSupport(VkPhysicalDevice device)
+{
     uint32_t extensionCount;
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
 
@@ -360,7 +375,8 @@ bool LveDevice::checkDeviceExtensionSupport(VkPhysicalDevice device) {
     return requiredExtensions.empty();
 }
 
-QueueFamilyIndices LveDevice::findQueueFamilies(VkPhysicalDevice device) {
+QueueFamilyIndices LveDevice::findQueueFamilies(VkPhysicalDevice device)
+{
     QueueFamilyIndices indices;
 
     uint32_t queueFamilyCount = 0;
@@ -436,9 +452,7 @@ VkFormat LveDevice::findSupportedFormat(
         {
             return format;
         }
-        else if (
-                 tiling == VK_IMAGE_TILING_OPTIMAL &&
-                 (props.optimalTilingFeatures & features) == features)
+        else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features)
         {
             return format;
         }
@@ -468,7 +482,8 @@ void LveDevice::createBuffer(
     VkBufferUsageFlags usage,
     VkMemoryPropertyFlags properties,
     VkBuffer &buffer,
-    VkDeviceMemory &bufferMemory) {
+    VkDeviceMemory &bufferMemory)
+{
     VkBufferCreateInfo bufferCreateInfo{};
     bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferCreateInfo.size = size;
