@@ -58,19 +58,20 @@ namespace lve
             vertexCount,
             VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        };
+        }; // Creates stagingBuffer's VkBuffer buffer and VkDevice memory attributes. Binds these two attributes.
         
-        stagingBuffer.map();
-        stagingBuffer.writeToBuffer((void*)vertices.data());
+        stagingBuffer.map(); // Maps stagingBuffer's memory to (void*) mapped
+        stagingBuffer.writeToBuffer((void*)vertices.data()); // Writes from vertices to mapped.
         
         vertexBuffer = std::make_unique<LveBuffer>(
             lveDevice,
             vertexSize,
             vertexCount,
             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-        
-        lveDevice.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize);
+            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+        ); // Creates vertexBuffer's VkBuffer buffer and VkDevice memory attributes. Binds these two attributes.
+        //                   src,                       dst
+        lveDevice.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize); // Copies from stagingBuffer's buffer to vertexBuffer's buffer.
     }
     
     void LveModel::createIndexBuffers(const std::vector<uint32_t>& indices)

@@ -97,6 +97,7 @@ void LveBuffer::writeToBuffer(void *data, VkDeviceSize size, VkDeviceSize offset
 
     if (size == VK_WHOLE_SIZE)
     {
+        // memcpy is (dest, src, count)
         memcpy(mapped, data, bufferSize);
     }
     else
