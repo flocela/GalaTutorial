@@ -131,6 +131,7 @@ namespace lve
         }
         else
         {
+            // draw vertexCount number of vertices and one instance.
             vkCmdDraw(commandBuffer, vertexCount, 1, 0, 0);
         }
         
@@ -183,7 +184,6 @@ namespace lve
             for (const auto &index : shape.mesh.indices)
             {
                 Vertex vertex{};
-                
                 if(index.vertex_index >= 0)
                 {
                     vertex.position =
@@ -199,8 +199,6 @@ namespace lve
                         attrib.colors[3 * index.vertex_index + 1],
                         attrib.colors[3 * index.vertex_index + 2]
                     };
-                    
-                   
                 }
                 
                 if(index.normal_index >= 0)

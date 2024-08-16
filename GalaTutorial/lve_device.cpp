@@ -165,7 +165,8 @@ void LveDevice::pickPhysicalDevice()
     //std::cout << "physical device: " << properties.deviceName << std::endl;
 }
 
-void LveDevice::createLogicalDevice() {
+void LveDevice::createLogicalDevice()
+{
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -216,7 +217,8 @@ void LveDevice::createLogicalDevice() {
     vkGetDeviceQueue(device_, indices.presentFamily, 0, &presentQueue_);
 }
 
-void LveDevice::createCommandPool() {
+void LveDevice::createCommandPool()
+{
     QueueFamilyIndices queueFamilyIndices = findPhysicalQueueFamilies();
 
     VkCommandPoolCreateInfo poolInfo = {};
@@ -386,7 +388,8 @@ QueueFamilyIndices LveDevice::findQueueFamilies(VkPhysicalDevice device)
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
     int i = 0;
-    for (const auto &queueFamily : queueFamilies) {
+    for (const auto &queueFamily : queueFamilies)
+    {
         if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
         {
             indices.graphicsFamily = i;
@@ -409,7 +412,8 @@ QueueFamilyIndices LveDevice::findQueueFamilies(VkPhysicalDevice device)
     return indices;
 }
 
-SwapChainSupportDetails LveDevice::querySwapChainSupport(VkPhysicalDevice device) {
+SwapChainSupportDetails LveDevice::querySwapChainSupport(VkPhysicalDevice device)
+{
     SwapChainSupportDetails details;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface_, &details.capabilities);
 
@@ -475,7 +479,7 @@ uint32_t LveDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags pr
 
     throw std::runtime_error("failed to find suitable memory type!");
 }
-//
+
 // initializes &buffer and &bufferMemory
 void LveDevice::createBuffer(
     VkDeviceSize size,
@@ -490,7 +494,8 @@ void LveDevice::createBuffer(
     bufferCreateInfo.usage = usage;
     bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    if (vkCreateBuffer(device_, &bufferCreateInfo, nullptr, &buffer) != VK_SUCCESS) {
+    if (vkCreateBuffer(device_, &bufferCreateInfo, nullptr, &buffer) != VK_SUCCESS)
+    {
         throw std::runtime_error("failed to create vertex buffer!");
     }
 

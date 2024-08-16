@@ -100,7 +100,10 @@ namespace lve
             //camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
             camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 10.f);
             
-            if ( auto commandBuffer = lveRenderer.beginFrame() )
+            // beginFrame() begins drawing to the vkCommandBuffer.
+            // Get current vkCommandBuffer buffer, then  vkBeginCommandBuffer(current vkCommandBuffer, ...)
+            auto commandBuffer = lveRenderer.beginFrame();
+            if ( commandBuffer )
             {
                 int frameIndex = lveRenderer.getFrameIndex();
                 
@@ -119,10 +122,18 @@ namespace lve
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
                 
-                // render
+                // Render
+                
+                //   Record to vkCommandBuffer to begin this render pass vkCmdRenderPass(...).
                 lveRenderer.beginSwapChainRenderPass(commandBuffer);
+                
+                //   Bind pipeline with vkCommandBuffer, vkCmdBindPipeline(...), then vkCmdDraw(...)
                 simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
+                
+                //   vkCmdEndRenderPass(...)
                 lveRenderer.endSwapChainRenderPass(commandBuffer);
+                
+                //   vkEndCommandBuffer(...), vkQueueSubmit(..., submitInfo containing buffer, ...)
                 lveRenderer.endFrame();
             }
         }

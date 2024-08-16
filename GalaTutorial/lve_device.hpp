@@ -8,13 +8,15 @@
 
 namespace lve {
 
-struct SwapChainSupportDetails {
+struct SwapChainSupportDetails
+{
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
 };
 
-struct QueueFamilyIndices {
+struct QueueFamilyIndices
+{
     uint32_t graphicsFamily;
     uint32_t presentFamily;
     bool graphicsFamilyHasValue = false;
@@ -22,8 +24,10 @@ struct QueueFamilyIndices {
     bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
 };
 
-class LveDevice {
+class LveDevice
+{
     public:
+    
     #ifdef NDEBUG
         const bool enableValidationLayers = false;
     #else
@@ -45,9 +49,18 @@ class LveDevice {
     VkQueue graphicsQueue() { return graphicsQueue_; }
     VkQueue presentQueue() { return presentQueue_; }
 
-    SwapChainSupportDetails getSwapChainSupport() { return querySwapChainSupport(physicalDevice); }
+    SwapChainSupportDetails getSwapChainSupport()
+    {
+        return querySwapChainSupport(physicalDevice);
+    }
+    
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-    QueueFamilyIndices findPhysicalQueueFamilies() { return findQueueFamilies(physicalDevice); }
+    
+    QueueFamilyIndices findPhysicalQueueFamilies()
+    {
+        return findQueueFamilies(physicalDevice);
+    }
+    
     VkFormat findSupportedFormat(
         const std::vector<VkFormat> &candidates,
         VkImageTiling tiling,
@@ -110,10 +123,11 @@ class LveDevice {
     VkQueue presentQueue_;
 
     const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
-    const std::vector<const char *> deviceExtensions = {
+    const std::vector<const char *> deviceExtensions =
+    {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
         "VK_KHR_portability_subset"}; // add "VK_KHR_portability_subset as macOS fix
-};
+    };
 
 }  // namespace lve
 

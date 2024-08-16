@@ -71,11 +71,12 @@ namespace lve
         
         auto commandBuffer = getCurrentCommandBuffer();
         
+        // Begin to record our draw commands to each buffer.
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         if ( vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS )
         {
-            throw std::runtime_error("failed to begin recording command buffer!");
+            throw std::runtime_error("failed to begin recording command buffer!"); // <<-- Begins draw command here!
         }
         return commandBuffer;
     }
