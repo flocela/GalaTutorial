@@ -480,7 +480,8 @@ uint32_t LveDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags pr
     throw std::runtime_error("failed to find suitable memory type!");
 }
 
-// initializes &buffer and &bufferMemory
+// Device memory has two parts, a VkBuffer and a VkDeviceMemory.
+// createBuffer() initializes &buffer and &bufferMemory.
 void LveDevice::createBuffer(
     VkDeviceSize size,
     VkBufferUsageFlags usage,

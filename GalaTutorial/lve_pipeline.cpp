@@ -61,10 +61,10 @@ namespace lve
             // 2) VkPipelineVertexInputStateCreateInfo,
             // 3) VkPipelineViewportStateCreateInfo,
             // 4) info from LvePipelineConfigInfo& configInfo that was passed in.
-        VkGraphicsPipelineCreateInfo pipelineInfo{};
-        VkPipelineShaderStageCreateInfo shaderStages[2];
-        VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-        VkPipelineViewportStateCreateInfo viewportInfo{};
+        VkGraphicsPipelineCreateInfo vkCreatePipelineCI{};
+        VkPipelineShaderStageCreateInfo shaderStagesCI[2];
+        VkPipelineVertexInputStateCreateInfo vertexInputStateCI{};
+        VkPipelineViewportStateCreateInfo viewportStateCI{};
         
         // Initialize 2 VkPipelineShaderStageCreateInfos in shaderStages array.
         auto vertCode = readFile(vertFilepath);
@@ -73,29 +73,29 @@ namespace lve
         createShaderModule(vertCode, vertShaderModule);
         createShaderModule(fragCode, fragShaderModule);
         
-        shaderStages[0].sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        shaderStages[0].stage               = VK_SHADER_STAGE_VERTEX_BIT;
-        shaderStages[0].module              = vertShaderModule;
-        shaderStages[0].pName               = "main";
-        shaderStages[0].flags               = 0;
-        shaderStages[0].pNext               = nullptr;
-        shaderStages[0].pSpecializationInfo = nullptr;
-        shaderStages[1].sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        shaderStages[1].stage               = VK_SHADER_STAGE_FRAGMENT_BIT;
-        shaderStages[1].module              = fragShaderModule;
-        shaderStages[1].pName               = "main";
-        shaderStages[1].flags               = 0;
-        shaderStages[1].pNext               = nullptr;
-        shaderStages[1].pSpecializationInfo = nullptr;
+        shaderStagesCI[0].sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shaderStagesCI[0].stage               = VK_SHADER_STAGE_VERTEX_BIT;
+        shaderStagesCI[0].module              = vertShaderModule;
+        shaderStagesCI[0].pName               = "main";
+        shaderStagesCI[0].flags               = 0;
+        shaderStagesCI[0].pNext               = nullptr;
+        shaderStagesCI[0].pSpecializationInfo = nullptr;
+        shaderStagesCI[1].sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shaderStagesCI[1].stage               = VK_SHADER_STAGE_FRAGMENT_BIT;
+        shaderStagesCI[1].module              = fragShaderModule;
+        shaderStagesCI[1].pName               = "main";
+        shaderStagesCI[1].flags               = 0;
+        shaderStagesCI[1].pNext               = nullptr;
+        shaderStagesCI[1].pSpecializationInfo = nullptr;
         
         // Initialize VkPipelineVertexInputStateCreateInfo.
         auto bindingDescriptions = LveModel::Vertex::getBindingDescriptions();
         auto attributeDescriptions = LveModel::Vertex::getAttributeDescriptions();
-        vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertexInputInfo.vertexBindingDescriptionCount   = static_cast<uint32_t>(bindingDescriptions.size());
-        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-        vertexInputInfo.pVertexBindingDescriptions      = bindingDescriptions.data();
-        vertexInputInfo.pVertexAttributeDescriptions    = attributeDescriptions.data();
+        vertexInputStateCI.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        vertexInputStateCI.vertexBindingDescriptionCount   = static_cast<uint32_t>(bindingDescriptions.size());
+        vertexInputStateCI.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+        vertexInputStateCI.pVertexBindingDescriptions      = bindingDescriptions.data();
+        vertexInputStateCI.pVertexAttributeDescriptions    = attributeDescriptions.data();
         
         //viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
         //viewportInfo.viewportCount  = 1;
@@ -106,30 +106,30 @@ namespace lve
         // Initialize VkGraphicsPipelineCreateInfo pipelineInfo.
         // Use shaderStages.
         // Use vertexInputInfo.
-        pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-        pipelineInfo.stageCount             = 2;
-        pipelineInfo.pStages                = shaderStages;
-        pipelineInfo.pVertexInputState      = &vertexInputInfo;
-        pipelineInfo.pInputAssemblyState    = &lvePipelineCI.inputAssemblyInfo;
-        pipelineInfo.pViewportState         = &lvePipelineCI.viewportInfo;
-        pipelineInfo.pRasterizationState    = &lvePipelineCI.rasterizationInfo;
-        pipelineInfo.pMultisampleState      = &lvePipelineCI.multisampleInfo;
-        pipelineInfo.pColorBlendState       = &lvePipelineCI.colorBlendInfo;
-        pipelineInfo.pDepthStencilState     = &lvePipelineCI.depthStencilInfo;
-        pipelineInfo.pDynamicState          = &lvePipelineCI.dynamicStateInfo;
+        vkCreatePipelineCI.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        vkCreatePipelineCI.stageCount             = 2;
+        vkCreatePipelineCI.pStages                = shaderStagesCI;
+        vkCreatePipelineCI.pVertexInputState      = &vertexInputStateCI;
+        vkCreatePipelineCI.pInputAssemblyState    = &lvePipelineCI.inputAssemblyInfo;
+        vkCreatePipelineCI.pViewportState         = &lvePipelineCI.viewportInfo;
+        vkCreatePipelineCI.pRasterizationState    = &lvePipelineCI.rasterizationInfo;
+        vkCreatePipelineCI.pMultisampleState      = &lvePipelineCI.multisampleInfo;
+        vkCreatePipelineCI.pColorBlendState       = &lvePipelineCI.colorBlendInfo;
+        vkCreatePipelineCI.pDepthStencilState     = &lvePipelineCI.depthStencilInfo;
+        vkCreatePipelineCI.pDynamicState          = &lvePipelineCI.dynamicStateInfo;
         
-        pipelineInfo.layout     = lvePipelineCI.pipelineLayout;
-        pipelineInfo.renderPass = lvePipelineCI.renderPass;
-        pipelineInfo.subpass    = lvePipelineCI.subpass;
+        vkCreatePipelineCI.layout     = lvePipelineCI.pipelineLayout;
+        vkCreatePipelineCI.renderPass = lvePipelineCI.renderPass;
+        vkCreatePipelineCI.subpass    = lvePipelineCI.subpass;
         
-        pipelineInfo.basePipelineIndex  = -1;
-        pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+        vkCreatePipelineCI.basePipelineIndex  = -1;
+        vkCreatePipelineCI.basePipelineHandle = VK_NULL_HANDLE;
         
         if(vkCreateGraphicsPipelines(
             lveDevice.device(),
             VK_NULL_HANDLE,
             1,
-            &pipelineInfo,
+            &vkCreatePipelineCI,
             nullptr,
             &graphicsPipeline) != VK_SUCCESS)
         {

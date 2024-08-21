@@ -27,10 +27,21 @@ namespace lve {
         VkResult map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
         void unmap();
 
-        void writeToBuffer(void* data, VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
-        VkResult flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
-        VkDescriptorBufferInfo descriptorInfo(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
-        VkResult invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+        void writeToBuffer(
+            void* data,
+            VkDeviceSize size = VK_WHOLE_SIZE,
+            VkDeviceSize offset = 0);
+        
+        VkResult flush(
+            VkDeviceSize size = VK_WHOLE_SIZE,
+            VkDeviceSize offset = 0);
+        VkDescriptorBufferInfo descriptorInfo(
+            VkDeviceSize size = VK_WHOLE_SIZE,
+            VkDeviceSize offset = 0);
+        
+        VkResult invalidate(
+            VkDeviceSize size = VK_WHOLE_SIZE,
+            VkDeviceSize offset = 0);
 
         void writeToIndex(void* data, int index);
         VkResult flushIndex(int index);
@@ -53,7 +64,7 @@ namespace lve {
         LveDevice& lveDevice;
         void* mapped = nullptr;
         VkBuffer buffer = VK_NULL_HANDLE;
-        VkDeviceMemory memory = VK_NULL_HANDLE;
+        VkDeviceMemory _memory = VK_NULL_HANDLE;
 
         VkDeviceSize bufferSize;
         uint32_t instanceCount;

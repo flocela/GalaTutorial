@@ -25,19 +25,20 @@ namespace lve {
                 std::unique_ptr<LveDescriptorSetLayout> build() const;
                 private:
                 LveDevice &lveDevice;
-                std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings{};
+                std::unordered_map<
+                    uint32_t, VkDescriptorSetLayoutBinding>bindings{};
             };
 
             LveDescriptorSetLayout(LveDevice &lveDevice, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
             ~LveDescriptorSetLayout();
             LveDescriptorSetLayout(const LveDescriptorSetLayout &) = delete;
             LveDescriptorSetLayout &operator=(const LveDescriptorSetLayout &) = delete;
-            VkDescriptorSetLayout getDescriptorSetLayout() const { return descriptorSetLayout; }
+            VkDescriptorSetLayout getDescriptorSetLayout() const { return vkDescriptorSetLayout; }
 
         private:
             LveDevice &lveDevice;
-            VkDescriptorSetLayout descriptorSetLayout;
-            std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings;
+            VkDescriptorSetLayout vkDescriptorSetLayout;
+            std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> vkBindings;
 
             friend class LveDescriptorWriter;
     };
@@ -82,15 +83,21 @@ namespace lve {
     class LveDescriptorWriter {
         
         public:
-            LveDescriptorWriter(LveDescriptorSetLayout &setLayout, LveDescriptorPool &pool);
-            LveDescriptorWriter &writeBuffer(uint32_t binding, VkDescriptorBufferInfo *bufferInfo);
-            LveDescriptorWriter &writeImage(uint32_t binding, VkDescriptorImageInfo *imageInfo);
+            LveDescriptorWriter(
+                LveDescriptorSetLayout &setLayout,
+                LveDescriptorPool &pool);
+            LveDescriptorWriter &writeBuffer(
+                uint32_t binding,
+                VkDescriptorBufferInfo *bufferInfo);
+            LveDescriptorWriter &writeImage(
+                uint32_t binding,
+                VkDescriptorImageInfo *imageInfo);
             bool build(VkDescriptorSet &set);
             void overwrite(VkDescriptorSet &set);
         private:
-            LveDescriptorSetLayout &setLayout;
+            LveDescriptorSetLayout &_setLayout;
             LveDescriptorPool &pool;
-            std::vector<VkWriteDescriptorSet> writes;
+            std::vector<VkWriteDescriptorSet> _writes;
     };
 }  // namespace lve
 

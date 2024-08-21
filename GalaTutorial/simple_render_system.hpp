@@ -34,7 +34,7 @@ namespace lve
         void createPipeline(VkRenderPass renderPass);
     
         LveDevice&                   lveDevice;
-        VkPipelineLayout             pipelineLayout;
+        VkPipelineLayout             vkPipelineLayout;
         std::unique_ptr<LvePipeline> lvePipeline;
         
     };

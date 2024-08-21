@@ -29,31 +29,34 @@ namespace lve
 
     SimpleRenderSystem::~SimpleRenderSystem()
     {
-        vkDestroyPipelineLayout(lveDevice.device(), pipelineLayout, nullptr);
+        vkDestroyPipelineLayout(lveDevice.device(), vkPipelineLayout, nullptr);
     }
 
-    void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
+    void SimpleRenderSystem::createPipelineLayout(
+        VkDescriptorSetLayout globalSetLayout)
     {
         // Not sending push constant here. Just telling Pipeline that one (or many) will be sent.
-        VkPushConstantRange pushConstantRange{};
-        pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-        pushConstantRange.offset = 0;
-        pushConstantRange.size = sizeof(SimplePushConstantData);
+        VkPushConstantRange vkPushConstantRange{};
+        vkPushConstantRange.stageFlags =
+            VK_SHADER_STAGE_VERTEX_BIT |
+            VK_SHADER_STAGE_FRAGMENT_BIT;
+        vkPushConstantRange.offset = 0;
+        vkPushConstantRange.size = sizeof(SimplePushConstantData);
         
         // pipelineLayoutInfo has pSetLayouts and pPushConstantRanges. This is information that is sent to the shader programs.
         // pSetLayouts is used to pass data other than vertex data to our vertex and fragment shaders (that is textures and uniform buffer objects).
         // push constants send small amount of data to shader programs.
         
-        std::vector<VkDescriptorSetLayout> descriptorSetLayouts{globalSetLayout};
+        std::vector<VkDescriptorSetLayout> vkDescriptorSetLayouts{globalSetLayout};
         
         
-        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
-        pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
-        pipelineLayoutInfo.pushConstantRangeCount = 1;
-        pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-        if ( vkCreatePipelineLayout(lveDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS )
+        VkPipelineLayoutCreateInfo vkPipelineLayoutInfoCI{};
+        vkPipelineLayoutInfoCI.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        vkPipelineLayoutInfoCI.setLayoutCount = static_cast<uint32_t>(vkDescriptorSetLayouts.size());
+        vkPipelineLayoutInfoCI.pSetLayouts = vkDescriptorSetLayouts.data();
+        vkPipelineLayoutInfoCI.pushConstantRangeCount = 1;
+        vkPipelineLayoutInfoCI.pPushConstantRanges = &vkPushConstantRange;
+        if ( vkCreatePipelineLayout(lveDevice.device(), &vkPipelineLayoutInfoCI, nullptr, &vkPipelineLayout) != VK_SUCCESS )
         {
             throw std::runtime_error("failed to create pipeline layout!");
         }
@@ -61,20 +64,20 @@ namespace lve
 
     void SimpleRenderSystem::createPipeline(VkRenderPass renderPass)
     {
-        assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout.");
+        assert(vkPipelineLayout != nullptr && "Cannot create pipeline before pipeline layout.");
         
-        LvePipelineConfigInfo pipelineConfig {};
-        LvePipeline::defaultPipelineConfigInfo(pipelineConfig);
+        LvePipelineConfigInfo lvePipelineCI {};
+        LvePipeline::defaultPipelineConfigInfo(lvePipelineCI);
         
-        pipelineConfig.renderPass = renderPass;
+        lvePipelineCI.renderPass = renderPass;
         
-        pipelineConfig.pipelineLayout = pipelineLayout;
+        lvePipelineCI.pipelineLayout = vkPipelineLayout;
         
         lvePipeline = std::make_unique<LvePipeline>(
             lveDevice,
             "/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/shaders/simple_shader.vert.spv",
             "/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/shaders/simple_shader.frag.spv",
-            pipelineConfig
+            lvePipelineCI
         );
     }
 
@@ -87,7 +90,7 @@ namespace lve
         vkCmdBindDescriptorSets(
             frameInfo.commandBuffer,
             VK_PIPELINE_BIND_POINT_GRAPHICS,
-            pipelineLayout,
+            vkPipelineLayout,
             0,
             1,
             &frameInfo.globalDescriptorSet,
@@ -102,7 +105,7 @@ namespace lve
             
             vkCmdPushConstants(
                 frameInfo.commandBuffer,
-                pipelineLayout,
+                vkPipelineLayout,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
                 sizeof(SimplePushConstantData),

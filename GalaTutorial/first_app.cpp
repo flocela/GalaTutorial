@@ -52,14 +52,16 @@ namespace lve
             uboBuffers[i]->map();
         }
         
-        auto globalSetLayout = LveDescriptorSetLayout::Builder(lveDevice)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+        std::unique_ptr<LveDescriptorSetLayout> globalSetLayout = LveDescriptorSetLayout::Builder(lveDevice)
+            .addBinding(0,
+                        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                        VK_SHADER_STAGE_VERTEX_BIT)
             .build();
         
-        std::vector<VkDescriptorSet> globalDescriptorSets(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
+        std::vector<VkDescriptorSet> globalDescriptorSets (LveSwapChain::MAX_FRAMES_IN_FLIGHT);
         for(int i=0; i<globalDescriptorSets.size(); i++)
         {
-            auto bufferInfo = uboBuffers[i]->descriptorInfo();
+            VkDescriptorBufferInfo bufferInfo = uboBuffers[i]->descriptorInfo();
             LveDescriptorWriter(*globalSetLayout, *globalPool)
                 .writeBuffer(0, &bufferInfo)
                 .build(globalDescriptorSets[i]);
@@ -100,9 +102,9 @@ namespace lve
             //camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
             camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 10.f);
             
-            // beginFrame() begins drawing to the vkCommandBuffer.
+            // beginFrame() begins drawing to the vkCommandBuffer and returns VkCommandBuffer.
             // Get current vkCommandBuffer buffer, then  vkBeginCommandBuffer(current vkCommandBuffer, ...)
-            auto commandBuffer = lveRenderer.beginFrame();
+            VkCommandBuffer commandBuffer = lveRenderer.beginFrame();
             if ( commandBuffer )
             {
                 int frameIndex = lveRenderer.getFrameIndex();

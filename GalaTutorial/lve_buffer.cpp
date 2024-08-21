@@ -22,7 +22,10 @@ namespace lve {
  *
  * @return VkResult of the buffer mapping call
  */
-VkDeviceSize LveBuffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
+VkDeviceSize LveBuffer::getAlignment(
+    VkDeviceSize instanceSize,
+    VkDeviceSize minOffsetAlignment)
+{
     if (minOffsetAlignment > 0)
     {
         return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);
@@ -46,14 +49,14 @@ LveBuffer::LveBuffer(
 {
     alignmentSize = getAlignment(instanceSize, minOffsetAlignment);
     bufferSize = alignmentSize * instanceCount;
-    device.createBuffer(bufferSize, usageFlags, memoryPropertyFlags, buffer, memory);
+    device.createBuffer(bufferSize, usageFlags, memoryPropertyFlags, buffer, _memory);
 }
  
 LveBuffer::~LveBuffer()
 {
     unmap();
     vkDestroyBuffer(lveDevice.device(), buffer, nullptr);
-    vkFreeMemory(lveDevice.device(), memory, nullptr);
+    vkFreeMemory(lveDevice.device(), _memory, nullptr);
 }
  
 /**
@@ -67,8 +70,8 @@ LveBuffer::~LveBuffer()
  */
 VkResult LveBuffer::map(VkDeviceSize size, VkDeviceSize offset)
 {
-    assert(buffer && memory && "Called map on buffer before create");
-    return vkMapMemory(lveDevice.device(), memory, offset, size, 0, &mapped);
+    assert(buffer && _memory && "Called map on buffer before create");
+    return vkMapMemory(lveDevice.device(), _memory, offset, size, 0, &mapped);
 }
  
 /**
@@ -76,9 +79,11 @@ VkResult LveBuffer::map(VkDeviceSize size, VkDeviceSize offset)
  *
  * @note Does not return a result as vkUnmapMemory can't fail
  */
-void LveBuffer::unmap() {
-    if (mapped) {
-        vkUnmapMemory(lveDevice.device(), memory);
+void LveBuffer::unmap()
+{
+    if (mapped)
+    {
+        vkUnmapMemory(lveDevice.device(), _memory);
         mapped = nullptr;
     }
 }
@@ -92,7 +97,11 @@ void LveBuffer::unmap() {
  * @param offset (Optional) Byte offset from beginning of mapped region
  *
  */
-void LveBuffer::writeToBuffer(void *data, VkDeviceSize size, VkDeviceSize offset) {
+void LveBuffer::writeToBuffer(
+    void *data,
+    VkDeviceSize size,
+    VkDeviceSize offset)
+{
     assert(mapped && "Cannot copy to unmapped buffer");
 
     if (size == VK_WHOLE_SIZE)
@@ -123,7 +132,7 @@ VkResult LveBuffer::flush(VkDeviceSize size, VkDeviceSize offset)
 {
     VkMappedMemoryRange mappedRange = {};
     mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    mappedRange.memory = memory;
+    mappedRange.memory = _memory;
     mappedRange.offset = offset;
     mappedRange.size = size;
     return vkFlushMappedMemoryRanges(lveDevice.device(), 1, &mappedRange);
@@ -144,7 +153,7 @@ VkResult LveBuffer::invalidate(VkDeviceSize size, VkDeviceSize offset)
 {
     VkMappedMemoryRange mappedRange = {};
     mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    mappedRange.memory = memory;
+    mappedRange.memory = _memory;
     mappedRange.offset = offset;
     mappedRange.size = size;
     return vkInvalidateMappedMemoryRanges(lveDevice.device(), 1, &mappedRange);
