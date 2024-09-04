@@ -21,7 +21,7 @@ namespace lve
         LveDevice& device,
         VkRenderPass renderPass,
         VkDescriptorSetLayout globalSetLayout)
-    :   lveDevice{device}
+    :   _lveDevice{device}
     {
         createPipelineLayout(globalSetLayout);
         createPipeline(renderPass);
@@ -29,7 +29,7 @@ namespace lve
 
     SimpleRenderSystem::~SimpleRenderSystem()
     {
-        vkDestroyPipelineLayout(lveDevice.device(), vkPipelineLayout, nullptr);
+        vkDestroyPipelineLayout(_lveDevice.device(), _vkPipelineLayout, nullptr);
     }
 
     void SimpleRenderSystem::createPipelineLayout(
@@ -56,7 +56,7 @@ namespace lve
         vkPipelineLayoutInfoCI.pSetLayouts = vkDescriptorSetLayouts.data();
         vkPipelineLayoutInfoCI.pushConstantRangeCount = 1;
         vkPipelineLayoutInfoCI.pPushConstantRanges = &vkPushConstantRange;
-        if ( vkCreatePipelineLayout(lveDevice.device(), &vkPipelineLayoutInfoCI, nullptr, &vkPipelineLayout) != VK_SUCCESS )
+        if ( vkCreatePipelineLayout(_lveDevice.device(), &vkPipelineLayoutInfoCI, nullptr, &_vkPipelineLayout) != VK_SUCCESS )
         {
             throw std::runtime_error("failed to create pipeline layout!");
         }
@@ -64,17 +64,17 @@ namespace lve
 
     void SimpleRenderSystem::createPipeline(VkRenderPass renderPass)
     {
-        assert(vkPipelineLayout != nullptr && "Cannot create pipeline before pipeline layout.");
+        assert(_vkPipelineLayout != nullptr && "Cannot create pipeline before pipeline layout.");
         
         LvePipelineConfigInfo lvePipelineCI {};
         LvePipeline::defaultPipelineConfigInfo(lvePipelineCI);
         
         lvePipelineCI.renderPass = renderPass;
         
-        lvePipelineCI.pipelineLayout = vkPipelineLayout;
+        lvePipelineCI.pipelineLayout = _vkPipelineLayout;
         
-        lvePipeline = std::make_unique<LvePipeline>(
-            lveDevice,
+        _lvePipeline = std::make_unique<LvePipeline>(
+            _lveDevice,
             "/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/shaders/simple_shader.vert.spv",
             "/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/shaders/simple_shader.frag.spv",
             lvePipelineCI
@@ -85,12 +85,12 @@ namespace lve
             FrameInfo& frameInfo,
             std::vector<LveGameObject>& gameObjects)
     {
-        lvePipeline->bind(frameInfo.commandBuffer);
+        _lvePipeline->bind(frameInfo.commandBuffer);
         
         vkCmdBindDescriptorSets(
             frameInfo.commandBuffer,
             VK_PIPELINE_BIND_POINT_GRAPHICS,
-            vkPipelineLayout,
+            _vkPipelineLayout,
             0,
             1,
             &frameInfo.globalDescriptorSet,
@@ -105,7 +105,7 @@ namespace lve
             
             vkCmdPushConstants(
                 frameInfo.commandBuffer,
-                vkPipelineLayout,
+                _vkPipelineLayout,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
                 sizeof(SimplePushConstantData),
