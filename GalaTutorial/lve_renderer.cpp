@@ -80,7 +80,7 @@ namespace lve
         }
         return commandBuffer;
     }
-
+//
     void LveRenderer::endFrame()
     {
         assert(isFrameStarted && "Can't call endFrame while frame is not in progress.");
