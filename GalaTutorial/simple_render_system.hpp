@@ -22,9 +22,11 @@ namespace lve
         
         ~SimpleRenderSystem();
         
-        SimpleRenderSystem(const SimpleRenderSystem& o) = delete;
+        SimpleRenderSystem(
+            const SimpleRenderSystem& o) = delete;
         
-        SimpleRenderSystem& operator=(const SimpleRenderSystem& o) = delete;
+        SimpleRenderSystem& operator=(
+            const SimpleRenderSystem& o) = delete;
         
         void renderGameObjects(
             FrameInfo& frameInfo,

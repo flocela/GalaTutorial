@@ -52,25 +52,31 @@ namespace lve
             uboBuffers[i]->map();
         }
         
-        std::unique_ptr<LveDescriptorSetLayout> globalSetLayout = LveDescriptorSetLayout::Builder(lveDevice)
-            .addBinding(0,
-                        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                        VK_SHADER_STAGE_VERTEX_BIT)
-            .build();
+        LveDescriptorSetLayout::Builder builder{lveDevice};
+        
+        builder.addBinding(
+            0,
+            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            VK_SHADER_STAGE_VERTEX_BIT);
+
+        std::unique_ptr<LveDescriptorSetLayout> globalSetLayout = builder.build();
         
         std::vector<VkDescriptorSet> globalDescriptorSets (LveSwapChain::MAX_FRAMES_IN_FLIGHT);
+        
         for(int i=0; i<globalDescriptorSets.size(); i++)
         {
             VkDescriptorBufferInfo bufferInfo = uboBuffers[i]->descriptorInfo();
-            LveDescriptorWriter(*globalSetLayout, *globalPool)
-                .writeBuffer(0, &bufferInfo)
-                .build(globalDescriptorSets[i]);
+            
+            LveDescriptorWriter lveDescWriter{*globalSetLayout, *globalPool};
+            
+            lveDescWriter.writeBuffer(0, &bufferInfo);
+            lveDescWriter.build(globalDescriptorSets[i]);
         }
         
         SimpleRenderSystem simpleRenderSystem(
           lveDevice,
           lveRenderer.getSwapChainRenderPass(),
-          globalSetLayout->getDescriptorSetLayout());
+          globalSetLayout->getVkDescriptorSetLayout());
         LveCamera camera{};
         //camera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5f, 0.f, 1.f));
         camera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));

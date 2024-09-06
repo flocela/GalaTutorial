@@ -5,27 +5,34 @@
 
 namespace lve
 {
-    // Descriptor Set Layout Builder
+    // LveDescriptorSetLayout methods:
+    
+    VkDescriptorSetLayout  LveDescriptorSetLayout::getVkDescriptorSetLayout() const
+    {
+        return _vkDescriptorSetLayout;
+    }
+    
+    // DescriptorSetLayout::Builder methods:
     
     LveDescriptorSetLayout::Builder &LveDescriptorSetLayout::Builder::addBinding(
-        uint32_t binding,
+        uint32_t bindingKey,
         VkDescriptorType descriptorType,
         VkShaderStageFlags stageFlags,
         uint32_t count)
     {
-        assert(bindings.count(binding) == 0 && "Binding already in use");
+        assert(_vkBindings.count(bindingKey) == 0 && "Binding already in use");
         VkDescriptorSetLayoutBinding vkDescSetLayoutBinding{};
-        vkDescSetLayoutBinding.binding = binding;
+        vkDescSetLayoutBinding.binding = bindingKey;
         vkDescSetLayoutBinding.descriptorType = descriptorType;
         vkDescSetLayoutBinding.descriptorCount = count;
         vkDescSetLayoutBinding.stageFlags = stageFlags;
-        bindings[binding] = vkDescSetLayoutBinding;
+        _vkBindings[bindingKey] = vkDescSetLayoutBinding;
         return *this;
     }
     
     std::unique_ptr<LveDescriptorSetLayout> LveDescriptorSetLayout::Builder::build() const
     {
-        return std::make_unique<LveDescriptorSetLayout>(lveDevice, bindings);
+        return std::make_unique<LveDescriptorSetLayout>(lveDevice, _vkBindings);
     }
     
     // Descriptor Set Layout
@@ -34,8 +41,8 @@ namespace lve
         LveDevice &lveDevice,
         std::unordered_map<uint32_t,
         VkDescriptorSetLayoutBinding> bindings)
-    :   lveDevice{lveDevice},
-        vkBindings{bindings}
+    :   _lveDevice{lveDevice},
+        _vkBindings{bindings}
     {
         std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings{};
         for (auto kv : bindings)
@@ -44,15 +51,18 @@ namespace lve
         }
 
         VkDescriptorSetLayoutCreateInfo vkDescriptorSetLayoutCI{};
+        
         vkDescriptorSetLayoutCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        
         vkDescriptorSetLayoutCI.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
+        
         vkDescriptorSetLayoutCI.pBindings = setLayoutBindings.data();
 
         if (vkCreateDescriptorSetLayout(
             lveDevice.device(),
             &vkDescriptorSetLayoutCI,
             nullptr,
-            &vkDescriptorSetLayout) != VK_SUCCESS)
+            &_vkDescriptorSetLayout) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create descriptor set layout!");
         }
@@ -60,7 +70,7 @@ namespace lve
      
     LveDescriptorSetLayout::~LveDescriptorSetLayout()
     {
-        vkDestroyDescriptorSetLayout(lveDevice.device(), vkDescriptorSetLayout, nullptr);
+        vkDestroyDescriptorSetLayout(_lveDevice.device(), _vkDescriptorSetLayout, nullptr);
     }
     
     // Descriptor Pool Builder
@@ -153,51 +163,30 @@ namespace lve
     
     // Descriptor Writer
     
-    LveDescriptorWriter::LveDescriptorWriter(LveDescriptorSetLayout &setLayout, LveDescriptorPool &pool)
+    LveDescriptorWriter::LveDescriptorWriter(
+        LveDescriptorSetLayout &setLayout,
+        LveDescriptorPool &pool)
     :   _setLayout{setLayout},
-        pool{pool}
+        _pool{pool}
     {}
      
     LveDescriptorWriter &LveDescriptorWriter::writeBuffer(
-        uint32_t binding,
+        uint32_t bindingKey,
         VkDescriptorBufferInfo *bufferInfo)
     {
-        assert(_setLayout.vkBindings.count(binding) == 1 && "Layout does not contain specified binding");
+        assert(_setLayout._vkBindings.count(bindingKey) == 1 &&
+               "Layout does not contain specified binding");
 
-        auto &bindingDescription = _setLayout.vkBindings[binding];
+        VkDescriptorSetLayoutBinding& bindingDescription = _setLayout._vkBindings[bindingKey];
 
-        assert(
-          bindingDescription.descriptorCount == 1 &&
-          "Binding single descriptor info, but binding expects multiple");
+        assert(bindingDescription.descriptorCount == 1 &&
+               "Binding single descriptor info, but binding expects multiple");
 
         VkWriteDescriptorSet write{};
         write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         write.descriptorType = bindingDescription.descriptorType;
-        write.dstBinding = binding;
+        write.dstBinding = bindingKey;
         write.pBufferInfo = bufferInfo;
-        write.descriptorCount = 1;
-
-        _writes.push_back(write);
-        return *this;
-    }
-     
-    LveDescriptorWriter &LveDescriptorWriter::writeImage(
-        uint32_t binding,
-        VkDescriptorImageInfo *imageInfo)
-    {
-        assert(_setLayout.vkBindings.count(binding) == 1 && "Layout does not contain specified binding");
-
-        auto &bindingDescription = _setLayout.vkBindings[binding];
-
-        assert(
-          bindingDescription.descriptorCount == 1 &&
-          "Binding single descriptor info, but binding expects multiple");
-
-        VkWriteDescriptorSet write{};
-        write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        write.descriptorType = bindingDescription.descriptorType;
-        write.dstBinding = binding;
-        write.pImageInfo = imageInfo;
         write.descriptorCount = 1;
 
         _writes.push_back(write);
@@ -206,7 +195,7 @@ namespace lve
      
     bool LveDescriptorWriter::build(VkDescriptorSet &set)
     {
-        bool success = pool.allocateDescriptor(_setLayout.getDescriptorSetLayout(), set);
+        bool success = _pool.allocateDescriptor(_setLayout.getVkDescriptorSetLayout(), set);
         if (!success)
         {
             return false;
@@ -221,7 +210,30 @@ namespace lve
         {
             write.dstSet = set;
         }
-        vkUpdateDescriptorSets(pool.lveDevice.device(), _writes.size(), _writes.data(), 0, nullptr);
+        vkUpdateDescriptorSets(_pool.lveDevice.device(), _writes.size(), _writes.data(), 0, nullptr);
     }
+    
+   LveDescriptorWriter &LveDescriptorWriter::writeImage(
+       uint32_t binding,
+       VkDescriptorImageInfo *imageInfo)
+   {
+       assert(_setLayout._vkBindings.count(binding) == 1 && "Layout does not contain specified binding");
+
+       auto &bindingDescription = _setLayout._vkBindings[binding];
+
+       assert(
+         bindingDescription.descriptorCount == 1 &&
+         "Binding single descriptor info, but binding expects multiple");
+
+       VkWriteDescriptorSet write{};
+       write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+       write.descriptorType = bindingDescription.descriptorType;
+       write.dstBinding = binding;
+       write.pImageInfo = imageInfo;
+       write.descriptorCount = 1;
+
+       _writes.push_back(write);
+       return *this;
+   }
 
 }

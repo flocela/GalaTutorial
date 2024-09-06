@@ -39,24 +39,19 @@ class LveGameObject
     LveGameObject(LveGameObject&& o) = default;
     LveGameObject& operator=(LveGameObject&& o) = default;
     
-    id_t getId()
-    {
-        return id;
-    }
+    id_t getId();
     
     std::shared_ptr<LveModel> model{};
-    glm::vec3 color{};
-    TransformComponent transform{};
     
+    glm::vec3 color{};
+    
+    TransformComponent transform{};
     
     private:
     
-    LveGameObject(id_t objId) : id{objId}
-    {
-        
-    }
+    LveGameObject(id_t objId);
     
-    id_t id;
+    id_t _id;
     
 };
 

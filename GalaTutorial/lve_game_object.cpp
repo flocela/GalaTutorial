@@ -59,4 +59,13 @@ namespace lve
             }
         };
     }
+
+    LveGameObject::LveGameObject(id_t objId)
+    : _id{objId}
+    {}
+    
+    id_t LveGameObject::getId()
+    {
+        return _id;
+    }
 }

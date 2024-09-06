@@ -34,8 +34,8 @@ namespace lve
         
         struct Builder
         {
-            std::vector<Vertex> vertices{};
-            std::vector<uint32_t> indices{};
+            std::vector<Vertex> _vertices{};
+            std::vector<uint32_t> _indices{};
             
             void loadModel(const std::string &filepath);
         };
@@ -55,14 +55,15 @@ namespace lve
         
         void createVertexBuffers(const std::vector<Vertex> &vertices);
         void createIndexBuffers(const std::vector<uint32_t>& indices);
-        LveDevice& lveDevice;
         
-        std::unique_ptr<LveBuffer> vertexBuffer;
-        uint32_t vertexCount;
+        LveDevice& _lveDevice;
         
-        bool hasIndexBuffer = false;
-        std::unique_ptr<LveBuffer> indexBuffer;
-        uint32_t indexCount;
+        std::unique_ptr<LveBuffer> _vertexBuffer;
+        uint32_t _vertexCount;
+        
+        bool _hasIndexBuffer = false;
+        std::unique_ptr<LveBuffer> _indexBuffer;
+        uint32_t _indexCount;
         
     };
 }
