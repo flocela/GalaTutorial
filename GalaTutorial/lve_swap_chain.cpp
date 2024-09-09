@@ -75,7 +75,52 @@ LveSwapChain::~LveSwapChain() {
         vkDestroyFence(device.device(), inFlightFences[i], nullptr);
     }
 }
+    
+VkFramebuffer LveSwapChain::getFrameBuffer(int index)
+{
+    return swapChainFramebuffers[index];
+}
+    
+VkRenderPass LveSwapChain::getRenderPass()
+{
+    return renderPass;
+}
+    
+VkImageView LveSwapChain::getImageView(int index)
+{
+    return swapChainImageViews[index];
+}
+    
+size_t LveSwapChain::imageCount()
+{
+    return swapChainImages.size();
+}
+    
+VkFormat LveSwapChain::getSwapChainImageFormat()
+{
+    return swapChainImageFormat;
+}
+    
+VkExtent2D LveSwapChain::getSwapChainExtent()
+{
+    return swapChainExtent;
+}
+    
+uint32_t LveSwapChain::LveSwapChain::width()
+{
+    return swapChainExtent.width;
+}
+    
+uint32_t LveSwapChain::height()
+{
+    return swapChainExtent.height;
+}
 
+float LveSwapChain::extentAspectRatio()
+{
+    return static_cast<float>(swapChainExtent.width) / static_cast<float>(swapChainExtent.height);
+}
+    
 VkResult LveSwapChain::acquireNextImage(uint32_t *imageIndex)
 {
     vkWaitForFences(
@@ -146,6 +191,12 @@ VkResult LveSwapChain::submitCommandBuffers(
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
     return result;
+}
+    
+bool LveSwapChain::compareSwapFormats(const LveSwapChain& swapChain) const
+{
+    return swapChain.swapChainDepthFormat == swapChainDepthFormat &&
+        swapChain.swapChainImageFormat == swapChainImageFormat;
 }
 
 void LveSwapChain::createSwapChain() {

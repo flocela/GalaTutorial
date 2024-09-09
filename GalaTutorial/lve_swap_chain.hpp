@@ -13,41 +13,51 @@
 namespace lve {
 
     class LveSwapChain {
+        
         public:
+        
         static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
         LveSwapChain(LveDevice &deviceRef, VkExtent2D windowExtent);
+        
         LveSwapChain(
             LveDevice &deviceRef,
             VkExtent2D windowExtent,
             std::shared_ptr<LveSwapChain> previous);
+        
         ~LveSwapChain();
 
         LveSwapChain(const LveSwapChain &) = delete;
+        
         void operator=(const LveSwapChain &) = delete;
 
-        VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
-        VkRenderPass getRenderPass() { return renderPass; }
-        VkImageView getImageView(int index) { return swapChainImageViews[index]; }
-        size_t imageCount() { return swapChainImages.size(); }
-        VkFormat getSwapChainImageFormat() { return swapChainImageFormat; }
-        VkExtent2D getSwapChainExtent() { return swapChainExtent; }
-        uint32_t width() { return swapChainExtent.width; }
-        uint32_t height() { return swapChainExtent.height; }
+        VkFramebuffer getFrameBuffer(int index);
+        
+        VkRenderPass getRenderPass();
+        
+        VkImageView getImageView(int index);
+        
+        size_t imageCount();
+        
+        VkFormat getSwapChainImageFormat();
+        
+        VkExtent2D getSwapChainExtent();
+        
+        uint32_t width();
+        
+        uint32_t height();
 
-        float extentAspectRatio() {
-            return static_cast<float>(swapChainExtent.width) / static_cast<float>(swapChainExtent.height);
-        }
+        float extentAspectRatio();
+        
         VkFormat findDepthFormat();
 
         VkResult acquireNextImage(uint32_t *imageIndex);
-        VkResult submitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
         
-        bool compareSwapFormats(const LveSwapChain& swapChain) const
-        {
-            return swapChain.swapChainDepthFormat == swapChainDepthFormat &&
-            swapChain.swapChainImageFormat == swapChainImageFormat;
-        }
+        VkResult submitCommandBuffers(
+            const VkCommandBuffer *buffers,
+            uint32_t *imageIndex);
+        
+        bool compareSwapFormats(const LveSwapChain& swapChain) const;
 
         private:
         void init();
@@ -61,8 +71,10 @@ namespace lve {
         // Helper functions
         VkSurfaceFormatKHR chooseSwapSurfaceFormat(
             const std::vector<VkSurfaceFormatKHR> &availableFormats);
+        
         VkPresentModeKHR chooseSwapPresentMode(
             const std::vector<VkPresentModeKHR> &availablePresentModes);
+        
         VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
 
         VkFormat swapChainImageFormat;

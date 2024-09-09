@@ -27,7 +27,7 @@ namespace lve
     {
         return _lveSwapChain->extentAspectRatio();
     }
-    
+    //
     bool LveRenderer::isFrameInProgress() const
     {
         return _isFrameStarted;
@@ -70,13 +70,14 @@ namespace lve
                 _lveDevice,
                 extent,
                 oldSwapChain);
+            
             if(!oldSwapChain->compareSwapFormats(*_lveSwapChain.get()))
             {
                 throw std::runtime_error("Swap chain image (or depth) format has changed.");
             }
         }
     }
-
+//
     VkCommandBuffer LveRenderer::beginFrame()
     {
         assert(!_isFrameStarted && "Can't all beginFrame while already in progress.");
