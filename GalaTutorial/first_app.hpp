@@ -29,9 +29,9 @@ namespace lve
         
         private:
         
-        LveWindow                    lveWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
-        LveDevice                    lveDevice{lveWindow};
-        LveRenderer                  lveRenderer{lveWindow, lveDevice};
+        LveWindow                    _lveWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
+        LveDevice                    _lveDevice{_lveWindow};
+        LveRenderer                  _lveRenderer{_lveWindow, _lveDevice};
         
         // note: order of declaration matters. Pool needs a device.
         std::unique_ptr<LveDescriptorPool> globalPool{};

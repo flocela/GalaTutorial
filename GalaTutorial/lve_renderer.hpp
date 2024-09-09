@@ -40,8 +40,8 @@ namespace lve
         void freeCommandBuffers();
         void recreateSwapChain();
         
-        LveWindow& lveWindow;
-        LveDevice& lveDevice;
+        LveWindow& _lveWindow;
+        LveDevice& _lveDevice;
         std::unique_ptr<LveSwapChain> _lveSwapChain;
         std::vector<VkCommandBuffer> _commandBuffers;
         

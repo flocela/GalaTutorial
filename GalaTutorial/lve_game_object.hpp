@@ -9,10 +9,9 @@ namespace lve
 
 struct TransformComponent
 {
-    
-    glm::vec3 translation{};
-    glm::vec3 scale{1.f, 1.f, 1.f};
-    glm::vec3 rotation{};
+    glm::vec3 _translation{};
+    glm::vec3 _scale{1.f, 1.f, 1.f};
+    glm::vec3 _rotation{};
     
     // Matrix corrsponds to Translate * Ry * Rx * Rz * Scale
     // Rotations correspond to Tait-bryan angles of Y(1), X(2), Z(3)
@@ -41,11 +40,11 @@ class LveGameObject
     
     id_t getId();
     
-    std::shared_ptr<LveModel> model{};
+    std::shared_ptr<LveModel> _model{};
     
-    glm::vec3 color{};
+    glm::vec3 _color{};
     
-    TransformComponent transform{};
+    TransformComponent _transformComp{};
     
     private:
     

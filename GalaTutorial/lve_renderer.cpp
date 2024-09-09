@@ -9,8 +9,8 @@ namespace lve
     LveRenderer::LveRenderer(
         LveWindow& window,
         LveDevice& device)
-    :   lveWindow{window},
-        lveDevice{device}
+    :   _lveWindow{window},
+        _lveDevice{device}
     {
         recreateSwapChain();
         createCommandBuffers();
@@ -51,23 +51,23 @@ namespace lve
 
     void LveRenderer::recreateSwapChain()
     {
-        auto extent = lveWindow.getExtent();
+        auto extent = _lveWindow.getExtent();
         while(extent.width == 0 || extent.height == 0)
         {
-            extent = lveWindow.getExtent();
+            extent = _lveWindow.getExtent();
             glfwWaitEvents();
         }
-        vkDeviceWaitIdle(lveDevice.device());
+        vkDeviceWaitIdle(_lveDevice.device());
             //lveSwapChain = nullptr;
         if(_lveSwapChain == nullptr)
         {
-            _lveSwapChain = std::make_unique<LveSwapChain>(lveDevice, extent);
+            _lveSwapChain = std::make_unique<LveSwapChain>(_lveDevice, extent);
         }
         else
         {
             std::shared_ptr<LveSwapChain> oldSwapChain = std::move(_lveSwapChain);
             _lveSwapChain = std::make_unique<LveSwapChain>(
-                lveDevice,
+                _lveDevice,
                 extent,
                 oldSwapChain);
             if(!oldSwapChain->compareSwapFormats(*_lveSwapChain.get()))
@@ -122,9 +122,9 @@ namespace lve
         auto result = _lveSwapChain->submitCommandBuffers(&commandBuffer, &_currentImageIndex);
         if(result == VK_ERROR_OUT_OF_DATE_KHR   ||
            result == VK_SUBOPTIMAL_KHR          ||
-           lveWindow.wasWindowResized())
+           _lveWindow.wasWindowResized())
         {
-            lveWindow.resetWindowResizedFlag();
+            _lveWindow.resetWindowResizedFlag();
             recreateSwapChain();
         }
         else if(result != VK_SUCCESS)
@@ -184,10 +184,10 @@ namespace lve
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandPool = lveDevice.getCommandPool();
+        allocInfo.commandPool = _lveDevice.getCommandPool();
         allocInfo.commandBufferCount = static_cast<uint32_t>(_commandBuffers.size());
         //
-        if (( vkAllocateCommandBuffers(lveDevice.device(), &allocInfo, _commandBuffers.data()) )
+        if (( vkAllocateCommandBuffers(_lveDevice.device(), &allocInfo, _commandBuffers.data()) )
                 != VK_SUCCESS )
         {
             throw std::runtime_error("failed to allocate command buffers!");
@@ -197,8 +197,8 @@ namespace lve
     void LveRenderer::freeCommandBuffers()
     {
         vkFreeCommandBuffers(
-            lveDevice.device(),
-            lveDevice.getCommandPool(),
+            _lveDevice.device(),
+            _lveDevice.getCommandPool(),
             static_cast<uint32_t>(_commandBuffers.size()),
             _commandBuffers.data());
         _commandBuffers.clear();

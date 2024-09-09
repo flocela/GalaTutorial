@@ -100,8 +100,8 @@ namespace lve
         for (LveGameObject& obj: gameObjects)
         {
             SimplePushConstantData push{};
-            push.modelMatrix = obj.transform.mat4();
-            push.normalMatrix = obj.transform.normalMatrix();
+            push.modelMatrix = obj._transformComp.mat4();
+            push.normalMatrix = obj._transformComp.normalMatrix();
             
             vkCmdPushConstants(
                 frameInfo.commandBuffer,
@@ -110,8 +110,8 @@ namespace lve
                 0,
                 sizeof(SimplePushConstantData),
                 &push);
-            obj.model->bind(frameInfo.commandBuffer);
-            obj.model->draw(frameInfo.commandBuffer);
+            obj._model->bind(frameInfo.commandBuffer);
+            obj._model->draw(frameInfo.commandBuffer);
         }
     }
 

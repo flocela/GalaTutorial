@@ -27,7 +27,7 @@ namespace lve
     
     FirstApp::FirstApp()
     {
-        globalPool = LveDescriptorPool::Builder(lveDevice)
+        globalPool = LveDescriptorPool::Builder(_lveDevice)
             .setMaxSets(LveSwapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, LveSwapChain::MAX_FRAMES_IN_FLIGHT)
             .build();
@@ -44,7 +44,7 @@ namespace lve
         for(int i=0; i<uboBuffers.size(); i++)
         {
             uboBuffers[i] = std::make_unique<LveBuffer>(
-                lveDevice,
+                _lveDevice,
                 sizeof(GlobalUbo),
                 1,
                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -52,7 +52,7 @@ namespace lve
             uboBuffers[i]->map();
         }
         
-        LveDescriptorSetLayout::Builder builder{lveDevice};
+        LveDescriptorSetLayout::Builder builder{_lveDevice};
         
         builder.addBinding(
             0,
@@ -74,20 +74,20 @@ namespace lve
         }
         
         SimpleRenderSystem simpleRenderSystem(
-          lveDevice,
-          lveRenderer.getSwapChainRenderPass(),
+          _lveDevice,
+          _lveRenderer.getSwapChainRenderPass(),
           globalSetLayout->getVkDescriptorSetLayout());
         LveCamera camera{};
         //camera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5f, 0.f, 1.f));
         camera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
         
-        auto viewerObject = LveGameObject::createGameObject();
-        viewerObject.transform.translation.z = -2.5;
+        LveGameObject viewerObject = LveGameObject::createGameObject();
+        viewerObject._transformComp._translation.z = -2.0;
         KeyboardMovementController cameraController{};
         //
         auto currentTime = std::chrono::high_resolution_clock::now();
         
-        while(!lveWindow.shouldClose())
+        while(!_lveWindow.shouldClose())
         {
             glfwPollEvents();
             
@@ -100,20 +100,20 @@ namespace lve
             float MAX_FRAME_TIME = 100.f;
             frameTime = glm::min(frameTime, MAX_FRAME_TIME);
             
-            cameraController.moveInPlaneXZ(lveWindow.getGLFWwindow(), frameTime, viewerObject);
-            camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
+            cameraController.moveInPlaneXZ(_lveWindow.getGLFWwindow(), frameTime, viewerObject);
+            camera.setViewYXZ(viewerObject._transformComp._translation, viewerObject._transformComp._rotation);
             
-            float aspect = lveRenderer.getAspectRatio();
+            float aspect = _lveRenderer.getAspectRatio();
             
             //camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
             camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 10.f);
             
             // beginFrame() begins drawing to the vkCommandBuffer and returns VkCommandBuffer.
             // Get current vkCommandBuffer buffer, then  vkBeginCommandBuffer(current vkCommandBuffer, ...)
-            VkCommandBuffer commandBuffer = lveRenderer.beginFrame();
+            VkCommandBuffer commandBuffer = _lveRenderer.beginFrame();
             if ( commandBuffer )
             {
-                int frameIndex = lveRenderer.getFrameIndex();
+                int frameIndex = _lveRenderer.getFrameIndex();
                 
                 FrameInfo frameInfo
                 {
@@ -133,44 +133,44 @@ namespace lve
                 // Render
                 
                 //   Record to vkCommandBuffer to begin this render pass vkCmdRenderPass(...).
-                lveRenderer.beginSwapChainRenderPass(commandBuffer);
+                _lveRenderer.beginSwapChainRenderPass(commandBuffer);
                 
                 //   Bind pipeline with vkCommandBuffer, vkCmdBindPipeline(...), then vkCmdDraw(...)
                 simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
                 
                 //   vkCmdEndRenderPass(...)
-                lveRenderer.endSwapChainRenderPass(commandBuffer);
+                _lveRenderer.endSwapChainRenderPass(commandBuffer);
                 
                 //   vkEndCommandBuffer(...), vkQueueSubmit(..., submitInfo containing buffer, ...)
-                lveRenderer.endFrame();
+                _lveRenderer.endFrame();
             }
         }
         
-        vkDeviceWaitIdle(lveDevice.device());
+        vkDeviceWaitIdle(_lveDevice.device());
     }
 
     void FirstApp::loadGameObjects()
     {
-        std::shared_ptr<LveModel> lveModel = LveModel::createModelFromFile(lveDevice, "/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/models/flat_vase.obj");
+        std::shared_ptr<LveModel> lveModel = LveModel::createModelFromFile(_lveDevice, "/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/models/flat_vase.obj");
         
         auto flatVase = LveGameObject::createGameObject();
-        flatVase.model = lveModel;
-        flatVase.transform.translation = {-.5f, .5f, 0.f};
-        flatVase.transform.scale = glm::vec3(3.f, 1.5f, 3.f);
+        flatVase._model = lveModel;
+        flatVase._transformComp._translation = {-.5f, .5f, 0.f};
+        flatVase._transformComp._scale = glm::vec3(3.f, 1.5f, 3.f);
         gameObjects.push_back(std::move(flatVase));
         
-        lveModel = LveModel::createModelFromFile(lveDevice, "/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/models/smooth_vase.obj");
+        lveModel = LveModel::createModelFromFile(_lveDevice, "/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/models/smooth_vase.obj");
         auto smoothVase = LveGameObject::createGameObject();
-        smoothVase.model = lveModel;
-        smoothVase.transform.translation = {.5f, .5f, 0.f};
-        smoothVase.transform.scale = glm::vec3(3.f, 1.5f, 3.f);
+        smoothVase._model = lveModel;
+        smoothVase._transformComp._translation = {.5f, .5f, 0.f};
+        smoothVase._transformComp._scale = glm::vec3(3.f, 1.5f, 3.f);
         gameObjects.push_back(std::move(smoothVase));
         
-        lveModel = LveModel::createModelFromFile(lveDevice, "/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/models/quad.obj");
+        lveModel = LveModel::createModelFromFile(_lveDevice, "/Users/flo/LocalDocuments/Projects/VulkanLearning/GalaTutorial/GalaTutorial/models/quad.obj");
         auto floor = LveGameObject::createGameObject();
-        floor.model = lveModel;
-        floor.transform.translation = {0.f, .5f, 0.f};
-        floor.transform.scale = glm::vec3(3.f, 1.0f, 3.f);
+        floor._model = lveModel;
+        floor._transformComp._translation = {0.f, .5f, 0.f};
+        floor._transformComp._scale = glm::vec3(3.f, 1.0f, 3.f);
         gameObjects.push_back(std::move(floor));
     }
 
