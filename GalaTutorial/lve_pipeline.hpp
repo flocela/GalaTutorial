@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace lve
-{
+{//
     struct LvePipelineConfigInfo
     {
         LvePipelineConfigInfo() = default;

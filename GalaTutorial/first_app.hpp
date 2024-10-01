@@ -9,7 +9,7 @@
 #include "lve_model.hpp"
 #include <memory>
 #include <vector>
-//
+
 namespace lve
 {
     class FirstApp

@@ -15,7 +15,7 @@
 #include <glm/gtc/constants.hpp>
 //
 namespace lve
-{
+{//
     struct GlobalUbo
     {
         glm::mat4 projectionView{1.f};

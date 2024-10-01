@@ -20,7 +20,7 @@ namespace lve
     {
         freeCommandBuffers();
     }
-    
+    //
     VkRenderPass LveRenderer::getSwapChainRenderPass() const {return _lveSwapChain->getRenderPass();}
     
     float LveRenderer::getAspectRatio() const
